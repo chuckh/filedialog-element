@@ -1,0 +1,26 @@
+{
+  "name": "filedialog-element",
+  "version": "1.0",
+  "homepage": "https://github.com/deandevl/filedialog-element",
+  "authors": [
+    "deandevl <deanr3@bardstown.com>"
+  ],
+  "description": "A polymer based web component to provide a file dialog for opening local files from the browser",
+  "main": "filedialog-element.html",
+  "dependencies" : {
+    "polymer" : "#^1.0.0"
+  },
+  "keywords": [
+    "polymer",
+    "filedialog-element"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

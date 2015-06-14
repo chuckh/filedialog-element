@@ -1,0 +1,81 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<dom-module id="filedialog-element">
+  <style>
+    :host {
+      display: block;
+    }
+    input[type="file"] {
+      display: none;
+    }
+  </style>
+  <template>
+    <input id="fileinput" type="file" on-change="fileEvent"/>
+    <button on-click="readFile">{{buttonText}}</button>
+  </template>
+</dom-module>
+
+<script>
+/* 'filedialog-element' provides a simple way to open and read local files.
+ *
+ * Event Fired:
+ *  The event 'filedialog-data' sends a data object containing the following:
+ *      fileData: raw data read from the file with text or binary output depending on 'format' attribute.
+ *      fileName: the name of file opened and read.
+ *      fileStatus: status of the read. Values are either 'OK' or 'Error'. If an error
+ *        FileData contains an error object.
+ */
+  'use strict';
+  Polymer({
+    is: 'filedialog-element',
+
+    //properties
+    properties: {
+      //'buttonText' is the text for the button-element in the template.
+      buttonText: {
+        type: String,
+        value: 'Read File'
+      },
+      //'format' is type of output as either 'text' or 'binary'--default is 'text'
+      format: {
+        type: String,
+        value: 'text'
+      }
+    },
+     /*
+      'readFile' responds to filedialog-element template's button click with a windows open file dialog.
+      The dialog originates from the template's hidden input element of type 'file'.
+    */
+    readFile: function(e,detail,sender){
+      var evt = document.createEvent('Event');
+      evt.initEvent('click', true, true);
+      this.$.fileinput.dispatchEvent(evt);
+    },
+    /*
+      'fileEvent' responds to on-change event from the input element which provides an 'e.target.files' object for
+      accessing the file name to be opened.  It uses javascript's FileReader to read the raw data
+     */
+    fileEvent: function(e,detail,sender){
+      var fileObj = e.target.files[0];
+      var fileName = fileObj.name;
+      var reader = new FileReader();
+      var self = this;
+      if(self.format != null) {
+        if(self.format == 'text') {
+          reader.readAsText(fileObj);
+        }else if(self.format == 'binary') {
+          reader.readAsBinaryString(fileObj)
+        }
+      }else {
+        self.fire('filedialog-data', {fileData: null, fileName: fileName, fileStatus: 'OK'});
+      }
+      reader.onload = function(event) {
+        self.fire('filedialog-data', {fileData: event.target.result, fileName: fileName, fileStatus: 'OK'});
+      };
+      reader.onerror = function(event) {
+        self.fire('filedialog-data', {fileData: event.target.error.code,fileName: fileName,fileStatus: 'Error'});
+      };
+    }
+  });
+</script>
+

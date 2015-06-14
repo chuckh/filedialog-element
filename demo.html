@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>filedialog-element Demo</title>
+    <meta charset="utf-8"/>
+    <meta name="description" content="Created by Rick on 11/18/2014."/>
+    <meta name="keywords" content=""/>
+    <meta name="author" content="Rick Dean"/>
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="filedialog-element.html">
+    <script>
+
+      window.addEventListener('WebComponentsReady', function(e) {
+        var filedialogText = document.querySelector('#textformat');
+        filedialogText.buttonText = 'Read a File (text output)';
+        filedialogText.addEventListener('filedialog-data',function(e){
+          window.alert('Read '+ e.detail.fileName);
+        });
+        var filedialogBinary = document.querySelector('#binaryformat');
+        filedialogBinary.buttonText = 'Read a File (binary output';
+        filedialogBinary.format = 'binary';
+        filedialogBinary.addEventListener('filedialog-data',function(e){
+          window.alert('Read '+ e.detail.fileName);
+        });
+      });
+    </script>
+  </head>
+  <style>
+    filedialog-element {
+      margin-top: 40px;
+    }
+  </style>
+  <body>
+    <filedialog-element id='textformat'></filedialog-element>
+    <filedialog-element id='binaryformat'></filedialog-element>
+  </body>
+</html>
