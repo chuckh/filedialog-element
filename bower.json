@@ -8,7 +8,8 @@
   "description": "A polymer based web component to provide a file dialog for opening local files from the browser",
   "main": "filedialog-element.html",
   "dependencies" : {
-    "polymer" : "#^1.0.0"
+    "polymer" : "#^1.0.0",
+    "progress-element": "https://github.com/deandevl/progress-element.git#develop"
   },
   "keywords": [
     "polymer",
