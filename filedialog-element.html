@@ -1,17 +1,54 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../progress-element/progress-element.html">
 
 <dom-module id="filedialog-element">
-  <style>
-    :host {
-      display: block;
-    }
-    input[type="file"] {
-      display: none;
-    }
-  </style>
   <template>
-    <input id="fileinput" type="file" on-change="fileEvent"/>
-    <button on-click="readFile">{{buttonText}}</button>
+    <style>
+      :host {
+        display: block;
+      }
+      #container {
+        display: flex;
+        flex-direction: var(--flex-direction,column);
+      }
+      #buttonSec {
+        display: flex;
+        flex-direction: row;
+      }
+      button:last-child {
+        margin-left: 20px;
+      }
+      button {
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 5px;
+        text-align: center;
+        font-family: var(--button-font-family,Verdana);
+        font-size: var(--button-font-size,12px);
+        background: var(--button-background,linear-gradient(to bottom, #969696 0, #969696 13%, #5f5f5f 33%, #1e1e1e 64%, #1e1e1e 100%));
+        color: var(--button-color,rgba(255, 255, 255, 0.901961));
+        box-shadow: var(--button-box-shadow,4px 4px 6px 1px rgba(0,0,0,0.4) , 2px 2px 2px 0 rgba(0,0,0,0.2));
+      }
+      progress-element {
+        margin-top: 20px;
+        margin-left: 20px;
+      }
+      input[type="file"] {
+        display: none;
+      }
+    </style>
+
+    <div id="container">
+      <input id="fileinput" type="file" on-change="fileEvent"/>
+      <section id="buttonSec">
+        <button on-click="readFile">{{buttonText}}</button>
+        <button on-click="cancelRead">Cancel</button>
+      </section>
+
+      <template is="dom-if" if="{{show_progress}}">
+        <progress-element id="progressEle" atitle="% read:" percent="{{_percent}}"></progress-element>
+      </template>
+    </div>
   </template>
 </dom-module>
 
@@ -29,6 +66,17 @@
   Polymer({
     is: 'filedialog-element',
 
+    //private
+    _reader: null,
+    _percent: 0,
+
+    ready: function(){
+      if(window.FileReader){
+      }else {
+        alert("The File API's are not fully supported in this browser.")
+      }
+    },
+
     //properties
     properties: {
       //'buttonText' is the text for the button-element in the template.
@@ -36,10 +84,19 @@
         type: String,
         value: 'Read File'
       },
-      //'format' is type of output as either 'text' or 'binary'--default is 'text'
+      //'format' is type of output as either 'text' or 'image'--default is 'text'
       format: {
         type: String,
         value: 'text'
+      },
+      just_filename: {
+        type: Boolean,
+        value: false
+      },
+      //show a progress bar
+      show_progress: {
+        type: Boolean,
+        value: false
       }
     },
      /*
@@ -51,31 +108,71 @@
       evt.initEvent('click', true, true);
       this.$.fileinput.dispatchEvent(evt);
     },
+    cancelRead: function(e){
+      if(this._reader != null){
+        this._reader.abort();
+      }
+    },
     /*
       'fileEvent' responds to on-change event from the input element which provides an 'e.target.files' object for
       accessing the file name to be opened.  It uses javascript's FileReader to read the raw data
      */
     fileEvent: function(e,detail,sender){
+      var self = this;
       var fileObj = e.target.files[0];
       var fileName = fileObj.name;
-      var reader = new FileReader();
-      var self = this;
-      if(self.format != null) {
+      self._reader = new FileReader();
+
+      if(self.just_filename) {
+        self.fire('filedialog-filename',{fileName: fileName});
+      }else{
         if(self.format == 'text') {
-          reader.readAsText(fileObj);
-        }else if(self.format == 'binary') {
-          reader.readAsBinaryString(fileObj)
+          self._reader.readAsText(fileObj);
+        }else if(self.format == 'image') {
+          self._reader.readAsDataURL(fileObj);
         }
-      }else {
-        self.fire('filedialog-data', {fileData: null, fileName: fileName, fileStatus: 'OK'});
+        self._reader.onprogress = self.updateProgress;
+        self._reader.onloadstart = function(e){
+          self._percent = 0;
+        };
+        self._reader.onload = function(event) {
+          self._percent = 100;
+          self.fire('filedialog-result', {fileResult: event.target.result, fileName: fileName, fileStatus: 'OK'});
+        };
+        self._reader.onabort = function(e){
+          alert('File read cancelled');
+        };
+        self._reader.onerror = self.errorHandler();
       }
-      reader.onload = function(event) {
-        self.fire('filedialog-data', {fileData: event.target.result, fileName: fileName, fileStatus: 'OK'});
-      };
-      reader.onerror = function(event) {
-        self.fire('filedialog-data', {fileData: event.target.error.code,fileName: fileName,fileStatus: 'Error'});
-      };
+    },
+    updateProgress: function(e){
+      if(e.lengthComputable){
+        var percent = Math.round((e.loaded/e.total) * 100);
+        if(percent < 100) {
+          this._percent = percent;
+        }
+      }
+    },
+    errorHandler: function(e){
+      var self = this;
+      if(e != undefined) {
+        var mess = '';
+        switch (e.target.error.code) {
+          case e.target.error.NOT_FOUND_ERR:
+            mess ='File Not Found';
+            break;
+          case e.target.error.NOT_READABLE_ERR:
+            mess = 'File is not readable';
+            break;
+          case e.target.error.ABORT_ERR:
+            break;
+          default:
+            mess = 'An error occurred reading this file';
+        }
+        self.fire('filedialog-result', {fileResult: null, fileName: fileName, fileStatus: mess});
+      }
     }
+
   });
 </script>
 

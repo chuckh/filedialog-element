@@ -1,22 +1,26 @@
 filedialog-element
 ==================
 
-**filedialog-element** is a Polymer based web component (version >= 1.0) to provide a file dialog for opening and reading local text or binary files from the browser.
+**filedialog-element** is a Polymer based web component (version >= 1.0) to provide a file dialog for opening and reading local text or image files from the browser.
 
-The element has two attribute:
+The element has four assignable properties:
 
 **buttonText** -- a string to label the button
 
-**format** -- specifies a 'text' or 'binary' read (default = 'text')
+**format** -- specifies a 'text' or 'image' read (default: 'text')
+
+**just_filename** -- a boolean which if `true` will send only the file name selected and not read the text or image data (default: `false`)
+
+**show_progress** -- a boolean which controls display of a progress bar during the reading (default: `false`)
 
 ----------
 
-**filedialog-element** fires the *filedialog-data* event with the following object:
+**filedialog-element** fires the *filedialog-result* event with the following object:
 
-{fileData: *the text or binary data*, fileName: *the file name*, fileStatus: *OK or Error*}
+	{fileResult: *the text or url source of the image*, fileName: *the file name*, fileStatus: *OK or an error message*}
 
-If **format** is not assigned then the event returns just a file name with *fileData* as null.
+For **format** equal to 'image' the *fileResult* would typically be the *src* property for an html image element.
 
 ----------
 
-The Bower file *bower.json* file is provided for installing **filedialog-element's** one dependency **polymer**.
+The Bower file *bower.json* file is provided for installing **filedialog-element's** two dependencies **polymer** and **progress-element**.
