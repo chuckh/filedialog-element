@@ -11,20 +11,29 @@
     <script>
 
       window.addEventListener('WebComponentsReady', function(e) {
-        var filedialogText = document.querySelector('#textformat');
-        var textOutput = document.querySelector('#text_output');
+        const filedialogText = document.querySelector('#textformat');
+        const textOutput = document.querySelector('#text_output');
         filedialogText.show_progress = true;
         filedialogText.buttonText = 'Read a Text File';
         filedialogText.addEventListener('filedialog-result',function(e){
           textOutput.innerText = e.detail.fileResult;
         });
-        var filedialogBinary = document.querySelector('#binaryformat');
-        var thumbImg = document.querySelector('#thumb_img');
-        filedialogBinary.show_progress = true;
-        filedialogBinary.buttonText = 'Read an Image File';
-        filedialogBinary.format = 'image';
-        filedialogBinary.addEventListener('filedialog-result',function(e){
+
+        const filedialogURL = document.querySelector('#urlformat');
+        const thumbImg = document.querySelector('#thumb_img');
+        filedialogURL.show_progress = true;
+        filedialogURL.buttonText = 'Read an Image File';
+        filedialogURL.format = 'url';
+        filedialogURL.addEventListener('filedialog-result',function(e){
           thumbImg.src = e.detail.fileResult;
+        });
+
+        const filedialogBinaryStr = document.querySelector('#binarystrformat');
+        const binarystrOutput = document.querySelector('#binarystr_output');
+        filedialogBinaryStr.buttonText = 'Read File as Binary String';
+        filedialogBinaryStr.format = 'binarystring';
+        filedialogBinaryStr.addEventListener('filedialog-result',function(e){
+          binarystrOutput.innerText = e.detail.fileResult;
         });
       });
     </script>
@@ -49,8 +58,13 @@
     </section>
 
     <section>
-      <filedialog-element id='binaryformat'></filedialog-element>
+      <filedialog-element id='urlformat'></filedialog-element>
       <img id="thumb_img" class="thumb output"/>
+    </section>
+
+    <section>
+      <filedialog-element id='binarystrformat'></filedialog-element>
+      <div id="binarystr_output" class="output"></div>
     </section>
   </body>
 </html>

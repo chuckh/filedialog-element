@@ -1,15 +1,15 @@
 filedialog-element
 ==================
 
-**filedialog-element** is a Polymer based web component (version >= 1.0) to provide a file dialog for opening and reading local text or image files from the browser.
+**filedialog-element** is a Polymer based web component button (version >= 1.0) that when clicked, provides a file dialog for opening and reading local files as text, binary string, data url, or array buffer from the browser.
 
-The element has four assignable properties:
+The element has 4 assignable properties:
 
 **buttonText** -- a string to label the button
 
-**format** -- specifies a 'text' or 'image' read (default: 'text')
+**format** -- specifies the reading format.  Acceptable values are 'text', 'binarystring', 'url', 'array' (default: 'text')
 
-**just_filename** -- a boolean which if `true` will send only the file name selected and not read the text or image data (default: `false`)
+**just_filename** -- a boolean which if `true` the component will fire an event, sending only the file name selected and not read/send the file contents (default: `false`)
 
 **show_progress** -- a boolean which controls display of a progress bar during the reading (default: `false`)
 
@@ -17,9 +17,7 @@ The element has four assignable properties:
 
 **filedialog-element** fires the *filedialog-result* event with the following object:
 
-	{fileResult: *the text or url source of the image*, fileName: *the file name*, fileStatus: *OK or an error message*}
-
-For **format** equal to 'image' the *fileResult* would typically be the *src* property for an html image element.
+	{fileResult: *the file's contents or data url*, fileName: *the file name selected*, fileStatus: *OK or an error message*}
 
 ----------
 

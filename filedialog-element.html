@@ -70,7 +70,7 @@
     _percent: 0,
 
     ready: function(){
-      if(window.FileReader){
+      if(FileReader){
       }else {
         alert("The File API's are not fully supported in this browser.")
       }
@@ -103,7 +103,7 @@
       The dialog originates from the template's hidden input element of type 'file'.
     */
     readFile: function(e,detail,sender){
-      var evt = document.createEvent('Event');
+      const evt = document.createEvent('Event');
       evt.initEvent('click', true, true);
       this.$.fileinput.dispatchEvent(evt);
     },
@@ -114,64 +114,68 @@
     },
     /*
       'fileEvent' responds to on-change event from the input element which provides an 'e.target.files' object for
-      accessing the file name to be opened.  It uses javascript's FileReader to read the raw data
+      accessing the file name to be opened.  It uses javascript's FileReader to read the raw data/data url
      */
     fileEvent: function(e,detail,sender){
-      var self = this;
-      var fileObj = e.target.files[0];
-      var fileName = fileObj.name;
-      self._reader = new FileReader();
+      const self = this;
+      const fileObj = e.target.files[0];
+      const fileName = fileObj.name;
+      this._reader = new FileReader();
 
-      if(self.just_filename) {
-        self.fire('filedialog-filename',{fileName: fileName});
+      if(this.just_filename) {
+        this.fire('filedialog-filename',{fileName: fileName});
       }else{
-        if(self.format == 'text') {
-          self._reader.readAsText(fileObj);
-        }else if(self.format == 'image') {
-          self._reader.readAsDataURL(fileObj);
+        if(this.format == 'text'){
+          this._reader.readAsText(fileObj);
+        }else if(this.format == 'binarystring') {
+          this._reader.readAsBinaryString(fileObj);
+        }else if(this.format == 'url') {
+          this._reader.readAsDataURL(fileObj);
+        }else if(this.format == 'array') {
+          this._reader.readAsArrayBuffer(fileObj);
         }
-        self._reader.onprogress = self.updateProgress;
-        self._reader.onloadstart = function(e){
+        this._reader.onprogress = this.updateProgress;
+        this._reader.onloadstart = function(e){
           self._percent = 0;
         };
-        self._reader.onload = function(event) {
+        this._reader.onload = function(event) {
           self._percent = 100;
           self.fire('filedialog-result', {fileResult: event.target.result, fileName: fileName, fileStatus: 'OK'});
         };
-        self._reader.onabort = function(e){
+        this._reader.onabort = function(e){
           alert('File read cancelled');
         };
-        self._reader.onerror = self.errorHandler();
+        this._reader.onerror = this.errorHandler();
       }
     },
     updateProgress: function(e){
       if(e.lengthComputable){
-        var percent = Math.round((e.loaded/e.total) * 100);
+        const percent = Math.round((e.loaded/e.total) * 100);
         if(percent < 100) {
           this._percent = percent;
         }
       }
     },
     errorHandler: function(e){
-      var self = this;
       if(e != undefined) {
-        var mess = '';
+        let mess = '';
         switch (e.target.error.code) {
           case e.target.error.NOT_FOUND_ERR:
-            mess ='File Not Found';
+            mess ='filedialog-element: File Not Found';
             break;
           case e.target.error.NOT_READABLE_ERR:
-            mess = 'File is not readable';
+            mess = 'filedialog-element: File is not readable';
             break;
           case e.target.error.ABORT_ERR:
+            mess = 'filedialog-element: Abort Error';
             break;
           default:
-            mess = 'An error occurred reading this file';
+            mess = 'filedialog-element: An error occurred reading this file';
         }
-        self.fire('filedialog-result', {fileResult: null, fileName: fileName, fileStatus: mess});
+        this.fire('filedialog-result', {fileResult: null, fileName: fileName, fileStatus: mess});
+        throw new Error('filedialog-element: ' + mess);
       }
     }
-
   });
 </script>
 
