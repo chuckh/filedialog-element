@@ -1,4 +1,4 @@
-<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../polymer/polymer.html">
 <link rel="import" href="../progress-element/progress-element.html">
 
 <dom-module id="filedialog-element">
@@ -38,14 +38,14 @@
   </style>
   <template>
     <div id="container">
-      <input id="fileinput" type="file" on-change="fileEvent"/>
+      <input id="fileinput" type="file" on-change="_fileEvent"/>
       <section id="buttonSec">
-        <button on-click="readFile">{{buttonText}}</button>
-        <button on-click="cancelRead">Cancel</button>
+        <button on-click="_readFile">[[buttonText]]</button>
+        <button on-click="_cancelRead">Cancel</button>
       </section>
 
-      <template is="dom-if" if="{{show_progress}}">
-        <progress-element id="progressEle" atitle="% read:" percent="{{_percent}}"></progress-element>
+      <template is="dom-if" if="[[show_progress]]">
+        <progress-element id="progressEle" atitle="% read:" percent="[[_percent]]"></progress-element>
       </template>
     </div>
   </template>
@@ -102,7 +102,7 @@
       'readFile' responds to filedialog-element template's button click with a windows open file dialog.
       The dialog originates from the template's hidden input element of type 'file'.
     */
-    readFile: function(e,detail,sender){
+    _readFile: function(e,detail,sender){
       const evt = document.createEvent('Event');
       evt.initEvent('click', true, true);
       this.$.fileinput.dispatchEvent(evt);
@@ -116,7 +116,7 @@
       'fileEvent' responds to on-change event from the input element which provides an 'e.target.files' object for
       accessing the file name to be opened.  It uses javascript's FileReader to read the raw data/data url
      */
-    fileEvent: function(e,detail,sender){
+    _fileEvent: function(e,detail,sender){
       const self = this;
       const fileObj = e.target.files[0];
       const fileName = fileObj.name;
@@ -134,7 +134,7 @@
         }else if(this.format == 'array') {
           this._reader.readAsArrayBuffer(fileObj);
         }
-        this._reader.onprogress = this.updateProgress;
+        this._reader.onprogress = this._updateProgress;
         this._reader.onloadstart = function(e){
           self._percent = 0;
         };
@@ -145,10 +145,10 @@
         this._reader.onabort = function(e){
           alert('File read cancelled');
         };
-        this._reader.onerror = this.errorHandler();
+        this._reader.onerror = this._errorHandler();
       }
     },
-    updateProgress: function(e){
+    _updateProgress: function(e){
       if(e.lengthComputable){
         const percent = Math.round((e.loaded/e.total) * 100);
         if(percent < 100) {
@@ -156,7 +156,7 @@
         }
       }
     },
-    errorHandler: function(e){
+    _errorHandler: function(e){
       if(e != undefined) {
         let mess = '';
         switch (e.target.error.code) {
