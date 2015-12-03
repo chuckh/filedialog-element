@@ -41,7 +41,9 @@
       <input id="fileinput" type="file" on-change="_fileEvent"/>
       <section id="buttonSec">
         <button on-click="_readFile">[[buttonText]]</button>
-        <button on-click="_cancelRead">Cancel</button>
+        <template is="dom-if" if="[[!just_filename]]">
+          <button on-click="_cancelRead">Cancel</button>
+        </template>
       </section>
 
       <template is="dom-if" if="[[show_progress]]">

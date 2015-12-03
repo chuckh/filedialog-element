@@ -17,7 +17,11 @@ The element has 4 assignable properties:
 
 **filedialog-element** fires the *filedialog-result* event with the following object:
 
-	{fileResult: *the file's contents or data url*, fileName: *the file name selected*, fileStatus: *OK or an error message*}
+{fileResult: *the file's contents or data url*, fileName: *the file name selected*, fileStatus: *OK or an error message*}
+
+When **just_filename** is `true` then the event *filedialog-filename* is fired with the following object: 
+
+{fileName: *the file name selected*}
 
 ----------
 

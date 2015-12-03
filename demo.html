@@ -11,6 +11,13 @@
     <script>
 
       window.addEventListener('WebComponentsReady', function(e) {
+        const justFileName = document.querySelector('#justfilename');
+        justFileName.just_filename = true;
+        justFileName.buttonText = 'Just File Name';
+        justFileName.addEventListener('filedialog-filename',function(e){
+          alert('Just the file name: ' + e.detail.fileName);
+        });
+
         const filedialogText = document.querySelector('#textformat');
         const textOutput = document.querySelector('#text_output');
         filedialogText.show_progress = true;
@@ -52,6 +59,10 @@
     }
   </style>
   <body>
+    <section>
+      <filedialog-element id="justfilename"></filedialog-element>
+    </section>
+
     <section>
       <filedialog-element id='textformat'></filedialog-element>
       <div id="text_output" class="output"></div>
